@@ -1,0 +1,20 @@
+{
+  "name": "blogman",
+  "description": "An easy-to-use blog engine for developers.",
+  "version": "0.1.0",
+  "homepage": "http://github.com/krlito/blogman-node.git",
+  "author": "Carlos Campo <carlos@campo.com.co>",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/krlito/blogman-node.git"
+  },
+  "directories": {
+    "lib": "./lib"
+  },
+  "dependencies": {
+    "filemonitor": "",
+    "async": "",
+    "showdown": ""
+  }
+}
+                                      
