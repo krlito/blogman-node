@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Blogman : An easy-to-use blog engine for developers." />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Blogman</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/krlito/blogman-node">View on GitHub</a>
+
+          <h1 id="project_title">Blogman</h1>
+          <h2 id="project_tagline">An easy-to-use blog engine for developers.</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/krlito/blogman-node/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/krlito/blogman-node/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <p>Blogman is an easy-to-use blog engine made for node.js platform. You only need to write your 
+articles/posts in markdown, put them in the posts folder and blogman will process them to be shown 
+on your website.</p>
+
+<p>This module is intended to be used in personal developers blogs. A working example can be seen in 
+<a href="http://campo.com.co/blog">my blog</a>. This blog engine is in alpha state because it still does not have all the 
+desired features. Anyway, it is fully operational as it is right now.</p>
+
+<h2>Requirements</h2>
+
+<p>Blogman depens on <a href="http://github.com/krlito/filemonitor-node">filemonitor-node</a>, which depends on <a href="http://github.com/rvoicilas/inotify-tools/wiki">inotify-tools</a>. To install inotify-tools 
+on a Linux (Debian/Ubuntu) system:</p>
+
+<pre><code>sudo apt-get install inotify-tools
+</code></pre>
+
+<p>For installing on other linux flavors, go <a href="http://github.com/rvoicilas/inotify-tools/wiki/#wiki-getting">here</a>.</p>
+
+<h2>Installation</h2>
+
+<p>Once <a href="http://github.com/rvoicilas/inotify-tools/wiki">inotify-tools</a> is installed. On your project directory:</p>
+
+<pre><code>npm install blogman
+</code></pre>
+
+<h2>Usage</h2>
+
+<p>Blogman has two operation modes as described in the following sub-sections.</p>
+
+<h3>Express integration mode</h3>
+
+<p>For using blogman with <a href="http://github.com/visionmedia/express/">express</a>, you just configure it passing the express application object.
+Also, you can pass an optional settings object as it is shown in the next example. Any setting not
+set in the settings object will take a default value. Default values are the same shown in the
+example, e.g. default <code>encoding</code> value is "utf8".</p>
+
+<div class="highlight">
+<pre>    <span class="kd">var</span> <span class="nx">express</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'express'</span><span class="p">),</span>
+      <span class="nx">blogman</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'blogman'</span><span class="p">),</span>
+      <span class="nx">app</span> <span class="o">=</span> <span class="nx">express</span><span class="p">.</span><span class="nx">createServer</span><span class="p">();</span>
+
+    <span class="c1">//... some express configuration code</span>
+
+    <span class="c1">//Routes</span>
+
+    <span class="nx">blogman</span><span class="p">.</span><span class="nx">configure</span><span class="p">(</span><span class="nx">app</span><span class="p">,</span> <span class="p">{</span>
+      <span class="nx">route</span><span class="o">:</span> <span class="s2">"/blog"</span><span class="p">,</span>
+      <span class="nx">blogdir</span><span class="o">:</span> <span class="s2">"./blog/"</span><span class="p">,</span>
+      <span class="nx">encoding</span><span class="o">:</span> <span class="s2">"utf8"</span><span class="p">,</span>
+      <span class="nx">postsPerPage</span><span class="o">:</span> <span class="mi">5</span>
+    <span class="p">});</span>
+    <span class="c1">//app.get...</span>
+    <span class="c1">//Other routes</span>
+</pre>
+</div>
+
+
+<p>If you want to use default setting values, you could just invoke <code>blogman.configure(app);</code>.
+In the example, full method arguments were used for demostration purposes.</p>
+
+<h4>So what blogman does is...</h4>
+
+<p>Assuming you use default settings as in the previous example. Postman will capture two routes:</p>
+
+<ul>
+<li>GET http://yoursite/blog(/:page)?</li>
+<li>GET http://yoursite/blog/post/:id</li>
+</ul><p>The first route is for showing your post list in a paginated way. The number of posts shown 
+per page is defined by property <code>postsPerPage</code>. The second route will be used for accessing 
+an specific article. For rendering these pages, blogman will use <code>blog</code> and <code>blogpost</code> 
+views in your express project. These two views MUST exist.</p>
+
+<p>Blogman will look for markdown files in the <code>./blog/posts/</code> folder. These files will be read 
+using the defined encoding. They will be parsed and processed so they can be shown when they are
+requested.</p>
+
+<p>A blogman example markdown file format is:</p>
+
+<pre><code>title: My First Post
+author: John Doe
+date: 01 May 2011 16:30:00 -0500
+
+This is my first post for blogman blog engine.
+
+Here there is another paragraph.
+</code></pre>
+
+<p>As you can see, blogman markdown files should have a special header with metadata for the post. 
+It is recommended to use at least these three properties (<code>title</code>, <code>author</code> and <code>date</code>). Anyway, 
+you could set any property you desire in the header like <code>keywords</code> or <code>location</code>. Header goes 
+from the beginning of the file until the first blank line is found.</p>
+
+<p>Notes:</p>
+
+<ul>
+<li>
+<code>date</code> is a very important property because posts are ordered using this criteria. Be careful 
+to use a valid javascript date string format as in the example. </li>
+<li>There is an <code>id</code> property which uniquely identifies a post. It is set to be the filename
+without <code>.markdown</code> extension. Do NOT declare this property inside the file.</li>
+<li>Each time an article file is put in the <code>./blog/posts</code> folder, it will be added to the 
+website without doing anything else.</li>
+</ul><h4>To render...</h4>
+
+<p>As stated previously, renderization is done using views <code>blog</code> and <code>blogpost</code> of the express 
+project. <code>blog</code> is used when a list of posts is to be rendered and <code>blogpost</code> is used when only 
+one post is going to be shown. In the latter case, the view will receive an object called <code>post</code>
+with all the properties in the header of the post. <code>post</code> also have a <code>content</code> property with 
+the HTML of the post content. If using jade, a view could be like this:</p>
+
+<div class="highlight">
+<pre>    <span class="nc">.blog-post</span>
+     <span class="nc">.blog-post-title</span>
+       <span class="nt">h2</span><span class="p">=</span> <span class="n">post</span><span class="o">.</span><span class="n">title</span>
+       <span class="nt">p</span> by &lt;b&gt;<span class="si">#{</span><span class="n">post</span><span class="o">.</span><span class="n">author</span><span class="si">}</span>&lt;/b&gt; on <span class="si">#{</span><span class="n">post</span><span class="o">.</span><span class="n">date</span><span class="si">}</span>
+     <span class="nc">.blog-post-content</span>
+       <span class="err">!= </span><span class="nt">post</span><span class="nc">.content</span>
+</pre>
+</div>
+
+
+<p>For the <code>blog</code> view (list of posts) case, you will receive a <code>posts</code> array. Then, you could do:</p>
+
+<div class="highlight">
+<pre>    <span class="nc">.content-title</span>
+      <span class="nt">h1</span> Blog Articles
+    <span class="nc">.blog-list</span>
+      <span class="nt">each</span> post in posts
+        <span class="nc">.blog-li</span>
+          <span class="nc">.blog-li-title</span>
+            <span class="nt">h2</span>
+              <span class="nt">a</span>(<span class="na">href=</span><span class="s">'/blog/post/#{post.id}'</span>)<span class="p">=</span> <span class="n">post</span><span class="o">.</span><span class="n">title</span>
+            <span class="nt">small</span><span class="p">=</span> <span class="n">post</span><span class="o">.</span><span class="n">date</span>
+          <span class="nc">.blog-li-preview</span>
+            <span class="err">!= </span><span class="nt">post</span><span class="nc">.preview</span>
+          <span class="nt">a</span><span class="nc">.btn.btn-primary</span>(<span class="na">href=</span><span class="s">'/blog/post/#{post.id}'</span>) Read more...
+    <span class="nc">.pagination.pagination-centered</span>
+      <span class="nt">ul</span>
+        <span class="p">-</span> <span class="k">for</span><span class="o">(</span><span class="k">var</span> <span class="n">i</span><span class="k">=</span><span class="mi">1</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">posts</span><span class="o">.</span><span class="n">pageCount</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span>
+          <span class="nt">if</span> i!==posts.page
+            <span class="nt">li</span>
+              <span class="nt">a</span>(<span class="na">href=</span><span class="s">'/blog/#{i}'</span>)<span class="p">=</span> <span class="n">i</span>
+          <span class="nt">else</span>
+            <span class="nt">li</span><span class="nc">.active</span>
+              <span class="nt">a</span><span class="p">=</span> <span class="n">i</span>
+</pre>
+</div>
+
+
+<p>In this example, you can see <code>posts</code> array has a <code>page</code> property to indicate the current page. 
+Also, each element of the array has a <code>preview</code> which is an HTML fragment of the full post content.</p>
+
+<h3>Post/Article manager mode</h3>
+
+<p>In this mode, you can configure Blogman passing <code>null</code> instead of an application object. In this
+case Blogman interface exposes methods <code>post(:id, callback(err, post))</code> and
+<code>posts(:page, callback(err, posts)</code> which will respectively return one and many posts objects so
+you can use them as you like. This objects are the same that would be passed to the views in the
+<em>express integration mode</em>.</p>
+
+<div class="highlight">
+<pre>    <span class="kd">var</span> <span class="nx">blogman</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'blogman'</span><span class="p">);</span>
+    <span class="nx">blogman</span><span class="p">.</span><span class="nx">configure</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+
+    <span class="nx">blogman</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">'welcome'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">postData</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span><span class="p">;</span> <span class="p">};</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">postData</span><span class="p">.</span><span class="nx">title</span><span class="p">);</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">postData</span><span class="p">.</span><span class="nx">content</span><span class="p">);</span>
+    <span class="p">});</span>
+</pre>
+</div>
+
+
+<h2>ToDo</h2>
+
+<p>As stated previously, Blogman in in alpha stage. Features planned to be added soon are:</p>
+
+<ul>
+<li>Automatic syntax highlighting.</li>
+<li>Support for comments. </li>
+<li>Support for RSS.</li>
+<li>Better layouts/views management support.</li>
+</ul>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Blogman maintained by <a href="https://github.com/krlito">krlito</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
