@@ -65,7 +65,7 @@ In the example, full method arguments were used for demostration purposes.
 
 Assuming you use default settings as in the previous example. Postman will capture two routes:
 - GET http://yoursite/blog(/:page)?
-- GET http://youtsite/blog/post/:id
+- GET http://yoursite/blog/post/:id
 
 The first route is for showing your post list in a paginated way. The number of posts shown 
 per page is defined by property `postsPerPage`. The second route will be used for accessing 
@@ -178,3 +178,4 @@ As stated previously, Blogman in in alpha stage. Features planned to be added so
 [inotifywait]: http://github.com/rvoicilas/inotify-tools/wiki
 [inotify-tools]: http://github.com/rvoicilas/inotify-tools/wiki
 [express]: http://github.com/visionmedia/express/ 
+[getting-inotify-tools]: http://github.com/rvoicilas/inotify-tools/wiki/#wiki-getting
